@@ -87,30 +87,42 @@ public class CampaignController {
      *
      * @return HttpResponse
      */
-    // sessionは 画面で埋め込むと偽装される心配があるので
-    // サーバ側で受け取る方が良い。
+    // sessionは 画面htmlで ${session.principal.userId} みたいにinput:hiddenで埋め込むと偽装される心配があるので
+    // サーバ側で取り出すほうがbetter. (研修レベルでは 画面htmlからでも問題はないが...)
     public HttpResponse create( CreateCampaignForm form, Session session) {
-        if (form.hasErrors()) {
+        if (form.hasErrors()) { // エラーに関しては参考にするcontrollerがあるので 難易度: 中~
             return builder(HttpResponse.of("Invalid"))
                     .set(HttpResponse::setStatus, 400)
                     .build();
         }
-        final LoginUserPrincipal principal = (LoginUserPrincipal) session.get("principal");
+        // この箇所が ClassCastException になる人には
+        // MavenProjects > re-importを行ってください. (そこそこ質問きました)
+        final LoginUserPrincipal principal = (LoginUserPrincipal) session.get("principal"); // ここが難易度: 高
 
         final Campaign entity = builder(new Campaign())
                 .set(Campaign::setTitle, form.getTitle())
                 .set(Campaign::setStatement, form.getStatement())
                 .set(Campaign::setGoal, form.getGoal())
-                .set(Campaign::setCreateUserId, principal.getUserId())
+                .set(Campaign::setCreateUserId, principal.getUserId()) // ここが難易度: 高
                 .build();
         final CampaignDao dao = domaProvider.getDao(CampaignDao.class);
         dao.insert(entity);
 
-        return builder(redirect("/campaign/" + entity.getCampaignId(), SEE_OTHER))
-                .set(HttpResponse::setFlash, new Flash("キャンペーン「" + shortenTitle(entity.getTitle()) + "」を作成しました。"))
+        final Flash onetimeMessage = new Flash("キャンペーン「" + shortenTitle(entity.getTitle()) + "」を作成しました。");
+        // ここは最悪、キャンペーン一覧 or indexページに遷移していても問題はない.
+        return builder(redirect("/campaign/" + entity.getCampaignId(), SEE_OTHER)) // entityから キャンペーンIDを取り出すという発想が難易度: 高↑↑
+                .set(HttpResponse::setFlash, onetimeMessage)
                 .build();
     }
 
+    /**
+     * キャンペーン詳細画面を表示します.
+     *
+     * @param campaignId 表示するキャンペーンのID
+     * @param signature form
+     * @param message 画面に表示するメッセージ
+     * @return response
+     */
     private HttpResponse showCampaign(Long campaignId, SignatureForm signature, String message) {
         CampaignDao campaignDao = domaProvider.getDao(CampaignDao.class);
         UserCampaign campaign = campaignDao.selectById(campaignId);
