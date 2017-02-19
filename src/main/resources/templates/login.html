@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Signature Collection</title>
+    <link href="http://fonts.googleapis.com/css?family=Exo:900" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/semantic-ui/2.2.6/semantic.min.css" rel="stylesheet"/>
+    <link href="/css/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="pusher">
+    <div th:replace="/shared/_header::header"></div>
+
+    <div class="full height image">
+        <div class="ui main container">
+            <div class="ui information container">
+                <div class="ui middle aligned center aligned grid">
+                    <div class="center column">
+                        <h1 class="ui center aligned header">ログイン</h1>
+                        <div class="ui segment">
+                            <form class="ui form" method="post" action="/login" th:action="@{~/login}"
+                                  th:classappend="${login.hasErrors()} ? 'error'">
+                                <div class="ui error message" th:if="${login.hasErrors('error')}" th:text="${login.getErrors('error').get(0)}"></div>
+                                <div class="field" th:classappend="${login.hasErrors('email') or login.hasErrors('error')} ? 'error'">
+                                    <input type="email" name="email" placeholder="メールアドレス"
+                                           th:value="${login.email != null} ? ${login.email}" />
+                                    <ul class="ui pointing red basic label" th:if="${login.hasErrors('email')}">
+                                        <li th:each="message : ${login.getErrors('email')}" th:text="${message}"></li>
+                                    </ul>
+                                </div>
+                                <div class="field" th:classappend="${login.hasErrors('pass') or login.hasErrors('error')} ? 'error'">
+                                    <input type="password" name="pass" placeholder="パスワード"/>
+                                    <ul class="ui pointing red basic label" th:if="${login.hasErrors('pass')}">
+                                        <li th:each="message : ${login.getErrors('pass')}" th:text="${message}"></li>
+                                    </ul>
+                                </div>
+                                <button class="ui fluid red button">ログイン</button>
+                            </form>
+                        </div>
+                        <a href="/register" class="register">アカウントをお持ちでない方はこちら</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

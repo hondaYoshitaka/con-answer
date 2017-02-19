@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+    <link href="http://fonts.googleapis.com/css?family=Exo:900" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/semantic-ui/2.2.6/semantic.min.css" rel="stylesheet"/>
+    <link href="/css/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="pusher">
+    <div th:replace="/shared/_header::header"></div>
+
+    <div class="full height image">
+        <div class="ui main container">
+            <div class="ui information container">
+                <h1 class="ui center aligned header" th:text="${campaign.title}">Sign title</h1>
+                <div class="ui center aligned header">
+                    <a th:text="${campaign.creatorName}">Created by</a>
+                </div>
+                <div class="ui positive message" th:if="${message != null}">
+                    <div class="header" th:text="${message}">Thank you</div>
+                </div>
+
+                <div class="ui grid">
+                    <div class="ten wide column">
+                        <div class="statement" th:utext="${campaign.statement}" ></div>
+                    </div>
+                    <div class="six wide column">
+                        <h2>今すぐ賛同</h2>
+                        <p><span th:text="${signatureCount}">345</span>人の賛同</p>
+                        <div class="ui red progress">
+                            <div class="bar" th:style="${'width:' + (signatureCount * 100 / campaign.goal) + '%'}"></div>
+                        </div>
+                        <p><span th:text="${campaign.goal}">1000</span>人まで残り<span th:text="${campaign.goal - signatureCount}">1</span>人の賛同者が必要です！</p>
+                        <form class="ui form" method="post" action="/campaign/1"
+                              th:action="@{~/campaign/{id}(id=${campaign.campaignId})}"
+                              th:classappend="${signature.hasErrors()} ? 'error'">
+                            <div class="field" th:classappend="${signature.hasErrors('name')} ? 'error'">
+                                <input type="text" name="name" placeholder="氏名"
+                                       th:value="${session != null and session.principal != null} ? ${session.principal.userName} : ${signature.name}" />
+                                <ul class="ui pointing red basic label" th:if="${signature.hasErrors('name')}">
+                                    <li th:each="message : ${signature.getErrors('name')}" th:text="${message}"></li>
+                                </ul>
+                            </div>
+                            <div class="field" th:classappend="${signature.hasErrors('signatureComment')} ? 'error'">
+                                <label>コメント(任意)</label>
+                                <textarea name="signatureComment" placeholder="コメント（任意）"
+                                          th:value="${signature.signatureComment}"></textarea>
+                                <ul class="ui pointing red basic label" th:if="${signature.hasErrors('signatureComment')}">
+                                    <li th:each="message : ${signature.getErrors('signatureComment')}" th:text="${message}"></li>
+                                </ul>
+                            </div>
+                            <button class="ui fluid red button">賛同する</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

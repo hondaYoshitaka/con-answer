@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Signature Collection</title>
+    <link href="http://fonts.googleapis.com/css?family=Exo:900" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/semantic-ui/2.2.6/semantic.min.css" rel="stylesheet"/>
+    <link href="/css/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="pusher">
+    <div th:replace="/shared/_header::header"></div>
+
+    <div class="full height image">
+        <div class="ui main container">
+            <div class="ui information container">
+                <div class="ui middle aligned center aligned grid">
+                    <div class="center column">
+                        <h1 class="ui center aligned header">キャンペーン作成</h1>
+                        <form class="ui form" method="post" action="/auth/campaign">
+                            <div class="field"><label>タイトル</label>
+                                <input type="text" name="title"/>
+                            </div>
+                            <div class="field"><label>ステートメント</label>
+                                <textarea name="statement" th:size="30"></textarea>
+                            </div>
+                            <div class="field"><label>ゴール</label>
+                                <input type="text" name="goal"/>
+                            </div>
+                            <button type="submit" class="ui primary button">作成</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
