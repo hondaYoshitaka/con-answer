@@ -2,6 +2,7 @@ package net.unit8.sigcolle.form;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 
@@ -10,11 +11,11 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class CreateCampaignForm extends FormBase {
-    @NotNull
+    @NotBlank
     @Length(max = 30)
     private String title;
 
-    @NotNull
+    @NotBlank
     @Length(max = 1000)  // システム的に確からしい数字
     private  String statement;
 

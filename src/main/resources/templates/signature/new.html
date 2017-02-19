@@ -17,15 +17,25 @@
                 <div class="ui middle aligned center aligned grid">
                     <div class="center column">
                         <h1 class="ui center aligned header">キャンペーン作成</h1>
-                        <form class="ui form" method="post" action="/auth/campaign">
+                        <form class="ui form" method="post" action="/auth/campaign" th:classappend="${form.hasErrors()} ? 'error'">
                             <div class="field"><label>タイトル</label>
-                                <input type="text" name="title"/>
+                                <input type="text" name="title" th:value="${form.title}" th:classappend="${form.hasErrors('title')} ? 'error'" />
+                                <ul class="ui pointing red basic label" th:if="${form.hasErrors('title')}">
+                                    <li th:each="error : ${form.getErrors('title')}" th:text="${error}"></li>
+                                </ul>
                             </div>
-                            <div class="field"><label>ステートメント</label>
-                                <textarea name="statement" th:size="30"></textarea>
+                            <div class="field"><label>本文</label>
+                                <textarea name="statement" th:size="30" th:value="${form.statement}" th:classappend="${form.hasErrors('statement')} ? 'error'"></textarea>
+                                <ul class="ui pointing red basic label" th:if="${form.hasErrors('statement')}">
+                                    <li th:each="error : ${form.getErrors('statement')}" th:text="${error}"></li>
+                                </ul>
+                                ※ マークダウン記法が利用可能です.
                             </div>
-                            <div class="field"><label>ゴール</label>
-                                <input type="text" name="goal"/>
+                            <div class="field"><label>目標人数</label>
+                                <input type="text" name="goal" th:value="${form.goal}" th:classappend="${form.hasErrors('goal')} ? 'error'" /> 人
+                                <ul class="ui pointing red basic label" th:if="${form.hasErrors('goal')}">
+                                    <li th:each="error : ${form.getErrors('goal')}" th:text="${error}"></li>
+                                </ul>
                             </div>
                             <button type="submit" class="ui primary button">作成</button>
                         </form>

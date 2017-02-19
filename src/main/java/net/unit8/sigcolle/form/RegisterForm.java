@@ -18,9 +18,6 @@ import org.hibernate.validator.constraints.Length;
  */
 @Data
 public class RegisterForm extends FormBase {
-    @Inject
-    private DomaProvider domaProvider;
-
     @DecimalMin("1")
     @DecimalMax("9999")
     private String userId;
@@ -42,19 +39,4 @@ public class RegisterForm extends FormBase {
     @Length(min = 4, max = 20)
     @Password
     private String pass;
-
-    @Override
-    public boolean hasErrors() {
-        return super.hasErrors();
-    }
-
-    @Override
-    public boolean hasErrors(String name) {
-        return super.hasErrors(name);
-    }
-
-    @Override
-    public List<String> getErrors(String name) {
-        return super.getErrors(name);
-    }
 }

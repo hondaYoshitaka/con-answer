@@ -18,6 +18,8 @@ import net.unit8.sigcolle.form.SignatureForm;
 import net.unit8.sigcolle.model.Campaign;
 import net.unit8.sigcolle.model.UserCampaign;
 import net.unit8.sigcolle.model.Signature;
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 
 import static enkan.util.BeanBuilder.builder;
 import static enkan.util.HttpResponseUtils.RedirectStatusCode.SEE_OTHER;
@@ -54,7 +56,6 @@ public class CampaignController {
     /**
      * 署名の追加処理.
      * @param form 画面入力された署名情報.
-     * @return HttpResponse
      */
     @Transactional
     public HttpResponse sign(SignatureForm form) {
@@ -76,32 +77,33 @@ public class CampaignController {
 
     /**
      * 新規キャンペーン作成画面表示.
-     * @return HttpResponse
      */
     public HttpResponse createForm() {
-        return templateEngine.render("signature/new");
+        return templateEngine.render("signature/new", "form", new CreateCampaignForm());
     }
 
     /**
-     * 新規キャンペーン作成処理.
+     * 新規キャンペーンを作成します.
      *
-     * @return HttpResponse
+     * @param form 入力フォーム
+     * @param session ユーザsession
      */
     // sessionは 画面htmlで ${session.principal.userId} みたいにinput:hiddenで埋め込むと偽装される心配があるので
     // サーバ側で取り出すほうがbetter. (研修レベルでは 画面htmlからでも問題はないが...)
     public HttpResponse create( CreateCampaignForm form, Session session) {
         if (form.hasErrors()) { // エラーに関しては参考にするcontrollerがあるので 難易度: 中~
-            return builder(HttpResponse.of("Invalid"))
-                    .set(HttpResponse::setStatus, 400)
-                    .build();
+            return templateEngine.render("signature/new","form", form);
         }
         // この箇所が ClassCastException になる人には
         // MavenProjects > re-importを行ってください. (そこそこ質問きました)
         final LoginUserPrincipal principal = (LoginUserPrincipal) session.get("principal"); // ここが難易度: 高
 
+        // ここは 気づけたらスゴイレベル.
+        final PegDownProcessor processor = new PegDownProcessor(Extensions.ALL);
+
         final Campaign entity = builder(new Campaign())
                 .set(Campaign::setTitle, form.getTitle())
-                .set(Campaign::setStatement, form.getStatement())
+                .set(Campaign::setStatement, processor.markdownToHtml(form.getStatement()))
                 .set(Campaign::setGoal, form.getGoal())
                 .set(Campaign::setCreateUserId, principal.getUserId()) // ここが難易度: 高
                 .build();
@@ -119,29 +121,29 @@ public class CampaignController {
      * キャンペーン詳細画面を表示します.
      *
      * @param campaignId 表示するキャンペーンのID
-     * @param signature form
+     * @param form 署名画面のform
      * @param message 画面に表示するメッセージ
-     * @return response
      */
-    private HttpResponse showCampaign(Long campaignId, SignatureForm signature, String message) {
+    private HttpResponse showCampaign(Long campaignId, SignatureForm form, String message) {
         CampaignDao campaignDao = domaProvider.getDao(CampaignDao.class);
         UserCampaign campaign = campaignDao.selectById(campaignId);
 
         SignatureDao signatureDao = domaProvider.getDao(SignatureDao.class);
-        int signatureCount = signatureDao.countByCampaignId(campaignId);
+        int count = signatureDao.countByCampaignId(campaignId);
 
-        return templateEngine.render("campaign",
+        Object[] params = {
                 "campaign", campaign,
-                "signatureCount", signatureCount,
-                "signature", signature,
+                "count", count,
+                "signature", form,
                 "message", message
-        );
+        };
+        return templateEngine.render("campaign", params);
     }
 
     /**
-     * タイトルを短縮して表示します.
+     * 必要があればタイトルを短縮して表示します.
      *
-     * @param title origina title
+     * @param title タイトル
      * @return 短縮したタイトル
      */
     private static String shortenTitle (String title) {

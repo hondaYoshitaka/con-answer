@@ -16,10 +16,10 @@ public class V5__InsertUser implements JdbcMigration {
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, 0L);
-            stmt.setString(2, "kawasima");
-            stmt.setString(3, "");
+            stmt.setString(2, "苗字");
+            stmt.setString(3, "なまえ");
             stmt.setString(4, "sample@tis.co.jp");
-            stmt.setString(5, "pass");
+            stmt.setString(5, "P@ss1");
             stmt.executeUpdate();
             connection.commit();
         }

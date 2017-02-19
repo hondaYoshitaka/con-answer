@@ -28,7 +28,7 @@
                                         <li th:each="message : ${user.getErrors('lastName')}" th:text="${message}"></li>
                                     </ul>
                                 </div>
-                                <div class="field"  th:classappend="${user.hasErrors('firstName')} ? 'error'">
+                                <div class="field" th:classappend="${user.hasErrors('firstName')} ? 'error'">
                                     <input type="text" name="firstName" placeholder="名"
                                            th:value="(${user.firstName}!=null)?${user.firstName}"/>
                                     <ul class="ui pointing red basic label" th:if="${user.hasErrors('firstName')}">

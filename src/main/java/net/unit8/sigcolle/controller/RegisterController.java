@@ -44,16 +44,15 @@ public class RegisterController {
      */
     @Transactional
     public HttpResponse register(RegisterForm form) {
-
         if (form.hasErrors()) {
             return templateEngine.render("register", "user", form);
         }
-
         UserDao userDao = domaProvider.getDao(UserDao.class);
 
         // メールアドレス重複チェック
         if (userDao.countByEmail(form.getEmail()) != 0) {
             form.setErrors(Multimap.of("email", EMAIL_ALREADY_EXISTS));
+
             return templateEngine.render("register",
                     "user", form
             );
